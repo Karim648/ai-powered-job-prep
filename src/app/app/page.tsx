@@ -57,9 +57,13 @@ async function JobInfos() {
           </Link>
         </Button>
       </div>
-      <div>
+      <div className="grid grid-cols-1 gap-6 has-hover:*:not-hover:opacity-70 lg:grid-cols-2">
         {jobInfos.map((jobInfo) => (
-          <Link key={jobInfo.id} href={`/app/job-infos/${jobInfo.id}`}>
+          <Link
+            className="transition-[transform_opacity] hover:scale-[1.02]"
+            key={jobInfo.id}
+            href={`/app/job-infos/${jobInfo.id}`}
+          >
             <Card className="h-full">
               <div className="flex h-full items-center justify-between">
                 <div className="h-full space-y-4">
@@ -86,6 +90,14 @@ async function JobInfos() {
             </Card>
           </Link>
         ))}
+        <Link className="transition-opacity" href="/app/job-infos/new">
+          <Card className="hover:border-primary/50 flex h-full items-center justify-center border-3 border-dashed bg-transparent shadow-none transition-colors">
+            <div className="flex items-center justify-center gap-2 text-lg">
+              <PlusIcon className="size-6" />
+              New Job Description
+            </div>
+          </Card>
+        </Link>
       </div>
     </div>
   );
