@@ -1,11 +1,22 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { db } from "@/db";
 import { JobInfoTable } from "@/db/schema";
+import { JobInfoForm } from "@/features/jobInfos/components/JobInfoForm";
 import { getJobInfoUserTag } from "@/features/jobInfos/dbCache";
+import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters";
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser";
 import { desc, eq } from "drizzle-orm";
-import { Loader2Icon } from "lucide-react";
+import { ArrowRightIcon, Loader2Icon, PlusIcon } from "lucide-react";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+import Link from "next/link";
 import { Suspense } from "react";
 
 export default function AppPage() {
@@ -32,6 +43,52 @@ async function JobInfos() {
   if (jobInfos.length === 0) {
     return <NoJobInfos />;
   }
+
+  return (
+    <div className="container my-4">
+      <div className="mb-6 flex justify-between">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl">
+          Select a job description
+        </h1>
+        <Button asChild>
+          <Link href="/app/job-infos/new">
+            <PlusIcon />
+            Create Job Description
+          </Link>
+        </Button>
+      </div>
+      <div>
+        {jobInfos.map((jobInfo) => (
+          <Link key={jobInfo.id} href={`/app/job-infos/${jobInfo.id}`}>
+            <Card className="h-full">
+              <div className="flex h-full items-center justify-between">
+                <div className="h-full space-y-4">
+                  <CardHeader>
+                    <CardTitle className="text-lg">{jobInfo.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-muted-foreground line-clamp-3">
+                    {jobInfo.description}
+                  </CardContent>
+                  <CardFooter className="flex gap-2">
+                    <Badge variant="outline">
+                      {formatExperienceLevel(jobInfo.experienceLevel)}
+                    </Badge>
+                    {jobInfo.title && (
+                      <Badge variant="outline">{jobInfo.title}</Badge>
+                    )}
+                  </CardFooter>
+                </div>
+
+                <CardContent>
+                  <ArrowRightIcon className="size-6" />
+                </CardContent>
+              </div>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function NoJobInfos() {
@@ -48,7 +105,9 @@ function NoJobInfos() {
         test interviews will be to the real thing.
       </p>
       <Card>
-        <CardContent>{/* <JobInfoForm /> */}</CardContent>
+        <CardContent>
+          <JobInfoForm />
+        </CardContent>
       </Card>
     </div>
   );

@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { UserAvatar } from "@/components/UserAvatar";
+import { UserAvatar } from "@/features/users/components/UserAvatar";
 import { SignOutButton, useClerk } from "@clerk/nextjs";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import {
