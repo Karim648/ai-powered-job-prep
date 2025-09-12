@@ -4,6 +4,7 @@ import z from "zod";
 export const env = createEnv({
   server: {
     CLERK_SECRET_KEY: z.string().min(1),
+    CLERK_WEBHOOK_SIGNING_SECRET: z.string().min(1),
     ARCJET_KEY: z.string().min(1),
     DB_PASSWORD: z.string().min(1),
     DB_USER: z.string().min(1),
@@ -17,7 +18,7 @@ export const env = createEnv({
       return {
         ...rest,
         DATABASE_URL: `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`,
-      }
+      };
     });
   },
   runtimeEnv: process.env,

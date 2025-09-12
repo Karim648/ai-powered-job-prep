@@ -1,0 +1,14 @@
+import { db } from "@/db";
+import { UserTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
+export async function upsertUser(values: typeof UserTable.$inferInsert) {
+  await db.insert(UserTable).values(values).onConflictDoUpdate({
+    target: UserTable.id,
+    set: values,
+  });
+}
+
+export async function deleteUser(id: string) {
+  await db.delete(UserTable).where(eq(UserTable.id, id));
+}
