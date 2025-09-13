@@ -4,10 +4,10 @@ import { revalidateJobInfoCache } from "./dbCache";
 import { eq } from "drizzle-orm";
 
 export async function insertJobInfo(jobInfo: typeof JobInfoTable.$inferInsert) {
-  const [newJobInfo] = await db
-    .insert(JobInfoTable)
-    .values(jobInfo)
-    .returning({ id: JobInfoTable.id, userId: JobInfoTable.userId });
+  const [newJobInfo] = await db.insert(JobInfoTable).values(jobInfo).returning({
+    id: JobInfoTable.id,
+    userId: JobInfoTable.userId,
+  });
 
   revalidateJobInfoCache(newJobInfo);
 
@@ -22,7 +22,10 @@ export async function updateJobInfo(
     .update(JobInfoTable)
     .set(jobInfo)
     .where(eq(JobInfoTable.id, id))
-    .returning({ id: JobInfoTable.id, userId: JobInfoTable.userId });
+    .returning({
+      id: JobInfoTable.id,
+      userId: JobInfoTable.userId,
+    });
 
   revalidateJobInfoCache(updatedJobInfo);
 

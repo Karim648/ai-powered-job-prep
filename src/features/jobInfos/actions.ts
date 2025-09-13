@@ -3,26 +3,24 @@
 import z from "zod";
 import { jobInfoSchema } from "./schemas";
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser";
-import { redirect } from "next/navigation";
 import { insertJobInfo, updateJobInfo as updateJobInfoDb } from "./db";
-import { db } from "@/db";
+import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
-import { JobInfoTable } from "@/db/schema";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import { getJobInfoIdTag } from "./dbCache";
+import { db } from "@/db";
+import { JobInfoTable } from "@/db/schema";
 
 export async function createJobInfo(unsafeData: z.infer<typeof jobInfoSchema>) {
-  const { userId } = await getCurrentUser({});
-
+  const { userId } = await getCurrentUser();
   if (userId == null) {
     return {
       error: true,
-      message: "You do not have permission to do this action",
+      message: "You don't have permission to do this",
     };
   }
 
   const { success, data } = jobInfoSchema.safeParse(unsafeData);
-
   if (!success) {
     return {
       error: true,
@@ -39,17 +37,15 @@ export async function updateJobInfo(
   id: string,
   unsafeData: z.infer<typeof jobInfoSchema>,
 ) {
-  const { userId } = await getCurrentUser({});
-
+  const { userId } = await getCurrentUser();
   if (userId == null) {
     return {
       error: true,
-      message: "You do not have permission to do this action",
+      message: "You don't have permission to do this",
     };
   }
 
   const { success, data } = jobInfoSchema.safeParse(unsafeData);
-
   if (!success) {
     return {
       error: true,
@@ -58,11 +54,10 @@ export async function updateJobInfo(
   }
 
   const existingJobInfo = await getJobInfo(id, userId);
-
   if (existingJobInfo == null) {
     return {
       error: true,
-      message: "You do not have permission to do this action",
+      message: "You don't have permission to do this",
     };
   }
 
@@ -71,12 +66,11 @@ export async function updateJobInfo(
   redirect(`/app/job-infos/${jobInfo.id}`);
 }
 
-export async function getJobInfo(id: string, userId: string) {
+async function getJobInfo(id: string, userId: string) {
   "use cache";
-
   cacheTag(getJobInfoIdTag(id));
 
-  return await db.query.JobInfoTable.findFirst({
+  return db.query.JobInfoTable.findFirst({
     where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
   });
 }

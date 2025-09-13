@@ -61,7 +61,7 @@ export function ThemeToggle() {
             )}
           >
             <Icon className="size-4" />
-            <span>{name}</span>
+            {name}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

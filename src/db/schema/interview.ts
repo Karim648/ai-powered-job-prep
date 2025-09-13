@@ -1,21 +1,20 @@
 import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "../schemaHelpers";
-import { relations } from "drizzle-orm";
- import { JobInfoTable } from "./jobInfo";
+import { JobInfoTable } from "./jobInfo";
+import { relations } from "drizzle-orm/relations";
 
 export const InterviewTable = pgTable("interviews", {
   id,
-  jobInfoId: uuid("job_info_id")
-    .notNull()
-    .references(() => JobInfoTable.id, { onDelete: "cascade" }),
+  jobInfoId: uuid()
+    .references(() => JobInfoTable.id, { onDelete: "cascade" })
+    .notNull(),
   duration: varchar().notNull(),
-  humeChatId: varchar("hume_chat_id"),
+  humeChatId: varchar(),
   feedback: varchar(),
   createdAt,
   updatedAt,
 });
 
-// every interview is related to one job
 export const interviewRelations = relations(InterviewTable, ({ one }) => ({
   jobInfo: one(JobInfoTable, {
     fields: [InterviewTable.jobInfoId],

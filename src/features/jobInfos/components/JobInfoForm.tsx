@@ -1,8 +1,9 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,8 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,23 +22,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { jobInfoSchema } from "../schemas";
-import { experienceLevels, JobInfoTable } from "@/db/schema";
 import { formatExperienceLevel } from "../lib/formatters";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { createJobInfo, updateJobInfo } from "../actions";
 import { toast } from "sonner";
+import { experienceLevels, JobInfoTable } from "@/db/schema";
+
+type JobInfoFormData = z.infer<typeof jobInfoSchema>;
 
 export function JobInfoForm({
   jobInfo,
 }: {
   jobInfo?: Pick<
     typeof JobInfoTable.$inferSelect,
-    "id" | "name" | "description" | "title" | "experienceLevel"
+    "id" | "name" | "title" | "description" | "experienceLevel"
   >;
 }) {
-  const form = useForm<z.infer<typeof jobInfoSchema>>({
+  const form = useForm<JobInfoFormData>({
     resolver: zodResolver(jobInfoSchema),
     defaultValues: jobInfo ?? {
       name: "",
@@ -47,7 +49,7 @@ export function JobInfoForm({
     },
   });
 
-  async function onSubmit(values: z.infer<typeof jobInfoSchema>) {
+  async function onSubmit(values: JobInfoFormData) {
     const action = jobInfo
       ? updateJobInfo.bind(null, jobInfo.id)
       : createJobInfo;
@@ -60,7 +62,7 @@ export function JobInfoForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -77,6 +79,7 @@ export function JobInfoForm({
             </FormItem>
           )}
         />
+
         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
           <FormField
             control={form.control}
@@ -99,6 +102,7 @@ export function JobInfoForm({
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="experienceLevel"
@@ -124,6 +128,7 @@ export function JobInfoForm({
             )}
           />
         </div>
+
         <FormField
           control={form.control}
           name="description"
@@ -132,8 +137,7 @@ export function JobInfoForm({
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="a Next.js 15 and React 19 fullstack web developer job that uses Drizzle ORM and Postgres for database management."
-                  className="resize-none"
+                  placeholder="A Next.js 15 and React 19 full stack web developer job that uses Drizzle ORM and Postgres for database management."
                   {...field}
                 />
               </FormControl>
@@ -145,12 +149,13 @@ export function JobInfoForm({
             </FormItem>
           )}
         />
+
         <Button
           disabled={form.formState.isSubmitting}
           type="submit"
           className="w-full"
         >
-          <LoadingSwap isLoading={form.formState.isLoading}>
+          <LoadingSwap isLoading={form.formState.isSubmitting}>
             Save Job Information
           </LoadingSwap>
         </Button>

@@ -1,11 +1,11 @@
+import { BackLink } from "@/components/BackLink";
 import { cn } from "@/lib/utils";
-import BackLink from "./BackLink";
-import { Suspense } from "react";
-import { db } from "@/db";
 import { eq } from "drizzle-orm";
-import { JobInfoTable } from "@/db/schema";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
-import { getJobInfoIdTag } from "@/features/jobInfos/dbCache";
+import { Suspense } from "react";
+import { getJobInfoIdTag } from "../dbCache";
+import { JobInfoTable } from "@/db/schema";
+import { db } from "@/db";
 
 export function JobInfoBackLink({
   jobInfoId,
@@ -33,10 +33,9 @@ async function JobName({ jobInfoId }: { jobInfoId: string }) {
 
 async function getJobInfo(id: string) {
   "use cache";
-
   cacheTag(getJobInfoIdTag(id));
 
-  return await db.query.JobInfoTable.findFirst({
+  return db.query.JobInfoTable.findFirst({
     where: eq(JobInfoTable.id, id),
   });
 }
