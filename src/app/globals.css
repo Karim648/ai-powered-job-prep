@@ -212,3 +212,12 @@
     letter-spacing: var(--tracking-normal);
   }
 }
+
+.custom-pricing-table.cl-pricingTableCard__pro {
+  @apply border-primary/50 relative my-0 overflow-visible py-9;
+
+  &::before {
+    content: "Most Popular";
+    @apply text-primary-foreground bg-primary absolute top-0 left-1/2 -translate-1/2 rounded-full px-4 py-1 text-sm;
+  }
+}
