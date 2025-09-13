@@ -19,6 +19,7 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
 
 const navLinks = [
   { name: "Interviews", href: "interviews", Icon: SpeechIcon },
@@ -28,6 +29,8 @@ const navLinks = [
 
 export function Navbar({ user }: { user: { name: string; imageUrl: string } }) {
   const { openUserProfile } = useClerk();
+  const { jobInfoId } = useParams();
+  const pathName = usePathname();
 
   return (
     <nav className="h-header border-b">
@@ -38,15 +41,24 @@ export function Navbar({ user }: { user: { name: string; imageUrl: string } }) {
         </Link>
 
         <div className="flex items-center gap-4">
-          {navLinks.map((link) => (
-            <Button key={link.name}>
-              <Link href={link.href} className="flex items-center gap-2">
-                <link.Icon />
-                {link.name}
-              </Link>
-            </Button>
-          ))}
+          {typeof jobInfoId === "string" &&
+            navLinks.map(({ name, href, Icon }) => {
+              const hrefPath = `/app/job-infos/${jobInfoId}/${href}`;
 
+              return (
+                <Button
+                  variant={pathName === hrefPath ? "secondary" : "ghost"}
+                  key={name}
+                  asChild
+                  className="cursor-pointer max-sm:hidden"
+                >
+                  <Link href={hrefPath}>
+                    <Icon />
+                    {name}
+                  </Link>
+                </Button>
+              );
+            })}
           <ThemeToggle />
 
           <DropdownMenu>
