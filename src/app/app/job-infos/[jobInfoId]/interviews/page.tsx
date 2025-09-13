@@ -1,4 +1,3 @@
-import { JobInfoBackLink } from "@/components/JobInfoBackLink";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +9,7 @@ import {
 import { db } from "@/db";
 import { InterviewTable } from "@/db/schema";
 import { getInterviewJobInfoTag } from "@/features/interviews/dbCache";
+import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
 import { getJobInfoIdTag } from "@/features/jobInfos/dbCache";
 import { formatDateTime } from "@/lib/formatters";
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser";
