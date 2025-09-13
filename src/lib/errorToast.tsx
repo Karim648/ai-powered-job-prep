@@ -27,6 +27,7 @@ export function errorToast(message: string) {
     toast.error("Woah! Slow down.", {
       description: "You are making too many requests. Please try again later.",
     });
+    return;
   }
 
   toast.error(message);
