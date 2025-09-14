@@ -31,6 +31,7 @@
     "@radix-ui/react-slot": "1.2.3",
     "@t3-oss/env-core": "0.13.8",
     "@t3-oss/env-nextjs": "0.13.8",
+    "ai": "5.0.44",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "drizzle-orm": "0.44.5",
@@ -51,6 +52,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "0.5.16",
     "@types/node": "^20",
     "@types/pg": "8.15.5",
     "@types/react": "^19",

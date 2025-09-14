@@ -7,7 +7,6 @@ import { canCreateQuestion } from "@/features/questions/permissions"
 import { PLAN_LIMIT_MESSAGE } from "@/lib/errorToast"
 import { generateAiQuestion } from "@/services/ai/questions"
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
-import { createDataStreamResponse } from "ai"
 import { and, asc, eq } from "drizzle-orm"
 import { cacheTag } from "next/dist/server/use-cache/cache-tag"
 import z from "zod"
@@ -45,25 +44,20 @@ export async function POST(req: Request) {
 
   const previousQuestions = await getQuestions(jobInfoId)
 
-  return createDataStreamResponse({
-    execute: async dataStream => {
-      const res = generateAiQuestion({
-        previousQuestions,
-        jobInfo,
+  const res = generateAiQuestion({
+    previousQuestions,
+    jobInfo,
+    difficulty,
+    onFinish: async question => {
+      await insertQuestion({
+        text: question,
+        jobInfoId,
         difficulty,
-        onFinish: async question => {
-          const { id } = await insertQuestion({
-            text: question,
-            jobInfoId,
-            difficulty,
-          })
-
-          dataStream.writeData({ questionId: id })
-        },
       })
-      res.mergeIntoDataStream(dataStream, { sendUsage: false })
     },
   })
+  
+  return res.toTextStreamResponse()
 }
 
 async function getQuestions(jobInfoId: string) {

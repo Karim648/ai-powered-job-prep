@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     answer,
   });
 
-  return res.toDataStreamResponse({ sendUsage: false });
+  return res.toTextStreamResponse();
 }
 
 async function getQuestion(id: string, userId: string) {

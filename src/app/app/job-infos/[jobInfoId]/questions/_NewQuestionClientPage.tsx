@@ -12,10 +12,9 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { formatQuestionDifficulty } from "@/features/questions/formatters";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useCompletion } from "@ai-sdk/react";
 import { errorToast } from "@/lib/errorToast";
-import z from "zod";
 import {
   JobInfoTable,
   questionDifficulties,
@@ -31,31 +30,55 @@ export function NewQuestionClientPage({
 }) {
   const [status, setStatus] = useState<Status>("init");
   const [answer, setAnswer] = useState<string | null>(null);
+  const [questionId, setQuestionId] = useState<string | null>(null);
+  const [question, setQuestion] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  // Fetch latest question (id + text) from DB after generation
+  const fetchLatestQuestion = async () => {
+    try {
+      const response = await fetch("/api/ai/questions/latest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobInfoId: jobInfo.id }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch question");
+
+      const data = await response.json();
+      setQuestionId(data.questionId);
+      setQuestion(data.questionText); // ✅ ensure UI matches DB
+    } catch (error) {
+      console.error("Error fetching question:", error);
+      errorToast("Failed to fetch latest question");
+    }
+  };
 
   const {
     complete: generateQuestion,
-    completion: question,
-    setCompletion: setQuestion,
+    completion: questionCompletion,
     isLoading: isGeneratingQuestion,
-    data,
   } = useCompletion({
     api: "/api/ai/questions/generate-question",
-    onFinish: () => {
+    onFinish: async (completion) => {
+      setQuestion(completion); // Set the streamed question text
+      await fetchLatestQuestion(); // pull stored question id
       setStatus("awaiting-answer");
     },
     onError: (error) => {
+      console.error("Question generation error:", error);
       errorToast(error.message);
     },
   });
 
   const {
     complete: generateFeedback,
-    completion: feedback,
-    setCompletion: setFeedback,
+    completion: feedbackCompletion,
     isLoading: isGeneratingFeedback,
   } = useCompletion({
     api: "/api/ai/questions/generate-feedback",
-    onFinish: () => {
+    onFinish: async (completion) => {
+      setFeedback(completion); // Set the streamed feedback text
       setStatus("awaiting-difficulty");
     },
     onError: (error) => {
@@ -63,14 +86,14 @@ export function NewQuestionClientPage({
     },
   });
 
-  const questionId = useMemo(() => {
-    const item = data?.at(-1);
-    if (item == null) return null;
-    const parsed = z.object({ questionId: z.string() }).safeParse(item);
-    if (!parsed.success) return null;
-
-    return parsed.data.questionId;
-  }, [data]);
+  // ✅ reset state properly
+  const reset = () => {
+    setStatus("init");
+    setQuestion(null);
+    setFeedback(null);
+    setAnswer(null);
+    setQuestionId(null);
+  };
 
   return (
     <div className="mx-w-[2000px] h-screen-header mx-auto flex w-full flex-grow flex-col items-center gap-4">
@@ -81,12 +104,7 @@ export function NewQuestionClientPage({
           </BackLink>
         </div>
         <Controls
-          reset={() => {
-            setStatus("init");
-            setQuestion("");
-            setFeedback("");
-            setAnswer(null);
-          }}
+          reset={reset}
           disableAnswerButton={
             answer == null || answer.trim() === "" || questionId == null
           }
@@ -96,20 +114,18 @@ export function NewQuestionClientPage({
             if (answer == null || answer.trim() === "" || questionId == null)
               return;
 
-            generateFeedback(answer?.trim(), { body: { questionId } });
+            generateFeedback(answer.trim(), { body: { questionId } });
           }}
           generateQuestion={(difficulty) => {
-            setQuestion("");
-            setFeedback("");
-            setAnswer(null);
+            reset();
             generateQuestion(difficulty, { body: { jobInfoId: jobInfo.id } });
           }}
         />
         <div className="hidden flex-grow md:block" />
       </div>
       <QuestionContainer
-        question={question}
-        feedback={feedback}
+        question={question || questionCompletion}
+        feedback={feedback || feedbackCompletion}
         answer={answer}
         status={status}
         setAnswer={setAnswer}
@@ -131,6 +147,12 @@ function QuestionContainer({
   status: Status;
   setAnswer: (value: string) => void;
 }) {
+  console.log(
+    "QuestionContainer render - question:",
+    question,
+    "status:",
+    status,
+  );
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow border-t">
       <ResizablePanel id="question-and-feedback" defaultSize={50} minSize={5}>
