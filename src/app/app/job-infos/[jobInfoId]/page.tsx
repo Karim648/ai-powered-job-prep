@@ -1,12 +1,13 @@
-import BackLink from "@/components/BackLink";
+import { BackLink } from "@/components/BackLink";
 import { Skeleton } from "@/components/Skeleton";
+import { SuspendedItem } from "@/components/SuspendedItem";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { db } from "@/db";
 import { JobInfoTable } from "@/db/schema";
@@ -18,7 +19,6 @@ import { ArrowRightIcon } from "lucide-react";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 
 const options = [
   {
@@ -51,49 +51,74 @@ export default async function JobInfoPage({
   params: Promise<{ jobInfoId: string }>;
 }) {
   const { jobInfoId } = await params;
-  const { userId, redirectToSignIn } = await getCurrentUser({});
-  if (userId == null) return redirectToSignIn();
 
-  const jobInfo = await getJobInfo(jobInfoId, userId);
+  const jobInfo = getCurrentUser().then(
+    async ({ userId, redirectToSignIn }) => {
+      if (userId == null) return redirectToSignIn();
 
-  if (jobInfo == null) return notFound();
+      const jobInfo = await getJobInfo(jobInfoId, userId);
+      if (jobInfo == null) return notFound();
+
+      return jobInfo;
+    },
+  );
 
   return (
     <div className="container my-4 space-y-4">
       <BackLink href="/app">Dashboard</BackLink>
+
       <div className="space-y-6">
-        <Suspense fallback={<Skeleton />}>
-          <header className="space-y-4">
-            <div className="space-y-2">
-              <h1 className="text-3xl md:text-4xl">{jobInfo?.name}</h1>
-              <div className="flex gap-2">
-                <Badge variant="secondary">
-                  {formatExperienceLevel(jobInfo.experienceLevel)}
-                </Badge>
-                {jobInfo.title && (
-                  <Badge variant="secondary">{jobInfo.title}</Badge>
+        <header className="space-y-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-4xl">
+              <SuspendedItem
+                item={jobInfo}
+                fallback={<Skeleton className="w-48" />}
+                result={(j) => j.name}
+              />
+            </h1>
+            <div className="flex gap-2">
+              <SuspendedItem
+                item={jobInfo}
+                fallback={<Skeleton className="w-12" />}
+                result={(j) => (
+                  <Badge variant="secondary">
+                    {formatExperienceLevel(j.experienceLevel)}
+                  </Badge>
                 )}
-              </div>
+              />
+              <SuspendedItem
+                item={jobInfo}
+                fallback={null}
+                result={(j) => {
+                  return (
+                    j.title && <Badge variant="secondary">{j.title}</Badge>
+                  );
+                }}
+              />
             </div>
-            <p className="text-muted-foreground line-clamp-3">
-              {jobInfo?.description}
-            </p>
-          </header>
-        </Suspense>
+          </div>
+          <p className="text-muted-foreground line-clamp-3">
+            <SuspendedItem
+              item={jobInfo}
+              fallback={<Skeleton className="w-96" />}
+              result={(j) => j.description}
+            />
+          </p>
+        </header>
 
         <div className="grid grid-cols-1 gap-6 has-hover:*:not-hover:opacity-70 lg:grid-cols-2">
           {options.map((option) => (
             <Link
               className="transition-[transform_opacity] hover:scale-[1.02]"
-              key={option.href}
               href={`/app/job-infos/${jobInfoId}/${option.href}`}
+              key={option.href}
             >
               <Card className="flex h-full flex-row items-start justify-between">
                 <CardHeader className="flex-grow">
                   <CardTitle>{option.label}</CardTitle>
                   <CardDescription>{option.description}</CardDescription>
                 </CardHeader>
-
                 <CardContent>
                   <ArrowRightIcon className="size-6" />
                 </CardContent>
@@ -108,10 +133,9 @@ export default async function JobInfoPage({
 
 async function getJobInfo(id: string, userId: string) {
   "use cache";
-
   cacheTag(getJobInfoIdTag(id));
 
-  return await db.query.JobInfoTable.findFirst({
+  return db.query.JobInfoTable.findFirst({
     where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
   });
 }
