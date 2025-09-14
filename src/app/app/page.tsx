@@ -105,7 +105,7 @@ function NoJobInfos() {
   return (
     <div className="container my-4 max-w-5xl">
       <h1 className="mb-4 text-3xl md:text-4xl lg:text-5xl">
-        Welcome to Landr
+        Welcome to Resumate AI
       </h1>
       <p className="text-muted-foreground mb-8">
         To get started, enter information about the type of job you are wanting

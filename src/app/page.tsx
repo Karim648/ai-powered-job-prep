@@ -36,7 +36,7 @@ function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <BrainCircuitIcon className="text-primary size-8" />
-            <h1 className="text-foreground text-2xl font-bold">Landr</h1>
+            <h1 className="text-foreground text-2xl font-bold">Resumate AI</h1>
           </div>
           <Suspense
             fallback={
@@ -431,7 +431,7 @@ function Stats() {
             <span className="text-primary">faster and better</span>
           </h3>
           <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
-            Don&apos;t just take our word for it. See how Landr users
+            Don&apos;t just take our word for it. See how Resumate AI users
             consistently outperform the competition in every metric that
             matters.
           </p>
@@ -479,7 +479,7 @@ function Testimonials() {
       avatar:
         "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=64&h=64&fit=crop&crop=face&auto=format&q=80",
       content:
-        "Landr completely transformed my interview preparation. The AI practice sessions felt so realistic that I walked into my Google interview feeling completely confident. Landed the offer on my first try!",
+        "Resumate AI completely transformed my interview preparation. The AI practice sessions felt so realistic that I walked into my Google interview feeling completely confident. Landed the offer on my first try!",
       timeToOffer: "3 weeks",
     },
     {
@@ -489,7 +489,7 @@ function Testimonials() {
       avatar:
         "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face&auto=format&q=80",
       content:
-        "I was struggling with behavioral questions until I found Landr. The AI helped me craft compelling stories and practice my delivery. Got offers from 3 different companies!",
+        "I was struggling with behavioral questions until I found Resumate AI. The AI helped me craft compelling stories and practice my delivery. Got offers from 3 different companies!",
       timeToOffer: "5 weeks",
     },
     {
@@ -499,7 +499,7 @@ function Testimonials() {
       avatar:
         "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face&auto=format&q=80",
       content:
-        "The resume optimization feature was a game-changer. My callback rate tripled after implementing Landr&apos;s suggestions. Worth every penny and more.",
+        "The resume optimization feature was a game-changer. My callback rate tripled after implementing Resumate AI&apos;s suggestions. Worth every penny and more.",
       timeToOffer: "4 weeks",
     },
     {
@@ -519,7 +519,7 @@ function Testimonials() {
       avatar:
         "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop&crop=face&auto=format&q=80",
       content:
-        "I was career-changing into tech and felt overwhelmed. Landr&apos;s personalized guidance gave me the confidence to pursue design roles. Now I&apos;m living my dream at Figma!",
+        "I was career-changing into tech and felt overwhelmed. Resumate AI&apos;s personalized guidance gave me the confidence to pursue design roles. Now I&apos;m living my dream at Figma!",
       timeToOffer: "6 weeks",
     },
     {
@@ -529,7 +529,7 @@ function Testimonials() {
       avatar:
         "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop&crop=face&auto=format&q=80",
       content:
-        "The salary negotiation tips alone paid for the platform 10x over. I increased my offer by $25K just by following Landr&apos;s guidance. Absolutely worth it!",
+        "The salary negotiation tips alone paid for the platform 10x over. I increased my offer by $25K just by following Resumate AI&apos;s guidance. Absolutely worth it!",
       timeToOffer: "4 weeks",
     },
   ];
@@ -544,7 +544,7 @@ function Testimonials() {
           </h3>
           <p className="text-muted-foreground mx-auto max-w-2xl text-xl text-pretty">
             Join thousands of professionals who&apos;ve accelerated their
-            careers with Landr
+            careers with Resumate AI
           </p>
         </div>
 
