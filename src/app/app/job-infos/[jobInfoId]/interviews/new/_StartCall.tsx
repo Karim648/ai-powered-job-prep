@@ -9,7 +9,7 @@ import {
 } from "@/features/interviews/actions";
 import { errorToast } from "@/lib/errorToast";
 import { CondensedMessages } from "@/services/hume/components/CondensedMessages";
-import { condensedChatMessages } from "@/services/hume/lib/condensedChatMessages";
+import { condenseChatMessages } from "@/services/hume/lib/condensedChatMessages";
 import { useVoice, VoiceReadyState } from "@humeai/voice-react";
 import { Loader2Icon, MicIcon, MicOffIcon, PhoneOffIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -20,17 +20,17 @@ export function StartCall({
   user,
   accessToken,
 }: {
+  accessToken: string;
   jobInfo: Pick<
     typeof JobInfoTable.$inferSelect,
-    "id" | "title" | "experienceLevel" | "description"
+    "id" | "title" | "description" | "experienceLevel"
   >;
   user: {
     name: string;
     imageUrl: string;
   };
-  accessToken: string;
 }) {
-  const { readyState, connect, chatMetadata, callDurationTimestamp } =
+  const { connect, readyState, chatMetadata, callDurationTimestamp } =
     useVoice();
   const [interviewId, setInterviewId] = useState<string | null>(null);
   const durationRef = useRef(callDurationTimestamp);
@@ -42,7 +42,6 @@ export function StartCall({
     if (chatMetadata?.chatId == null || interviewId == null) {
       return;
     }
-
     updateInterview(interviewId, { humeChatId: chatMetadata.chatId });
   }, [chatMetadata?.chatId, interviewId]);
 
@@ -55,10 +54,8 @@ export function StartCall({
       updateInterview(interviewId, { duration: durationRef.current });
     }, 10000);
 
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [chatMetadata?.chatId, interviewId]);
+    return () => clearInterval(intervalId);
+  }, [interviewId]);
 
   // Handle disconnect
   useEffect(() => {
@@ -79,12 +76,10 @@ export function StartCall({
         <Button
           size="lg"
           onClick={async () => {
-            // TODO: create interview
             const res = await createInterview({ jobInfoId: jobInfo.id });
             if (res.error) {
               return errorToast(res.message);
             }
-
             setInterviewId(res.id);
 
             connect({
@@ -121,7 +116,7 @@ export function StartCall({
 
   return (
     <div className="h-screen-header flex flex-col-reverse overflow-y-auto">
-      <div className="container flex flex-col items-center justify-end py-6">
+      <div className="container flex flex-col items-center justify-end gap-4 py-6">
         <Messages user={user} />
         <Controls />
       </div>
@@ -130,10 +125,10 @@ export function StartCall({
 }
 
 function Messages({ user }: { user: { name: string; imageUrl: string } }) {
-  const { fft, messages } = useVoice();
+  const { messages, fft } = useVoice();
 
   const condensedMessages = useMemo(() => {
-    return condensedChatMessages(messages);
+    return condenseChatMessages(messages);
   }, [messages]);
 
   return (
@@ -147,7 +142,7 @@ function Messages({ user }: { user: { name: string; imageUrl: string } }) {
 }
 
 function Controls() {
-  const { callDurationTimestamp, disconnect, micFft, mute, unmute, isMuted } =
+  const { disconnect, isMuted, mute, unmute, micFft, callDurationTimestamp } =
     useVoice();
 
   return (
@@ -167,7 +162,12 @@ function Controls() {
       <div className="text-muted-foreground text-sm tabular-nums">
         {callDurationTimestamp}
       </div>
-      <Button variant="ghost" size="icon" className="" onClick={disconnect}>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="-mx-3"
+        onClick={disconnect}
+      >
         <PhoneOffIcon className="text-destructive" />
         <span className="sr-only">End Call</span>
       </Button>

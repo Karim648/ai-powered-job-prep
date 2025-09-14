@@ -1,7 +1,7 @@
-import { JobInfoBackLink } from "@/components/JobInfoBackLink";
 import { Card, CardContent } from "@/components/ui/card";
 import { db } from "@/db";
 import { JobInfoTable } from "@/db/schema";
+import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
 import { JobInfoForm } from "@/features/jobInfos/components/JobInfoForm";
 import { getJobInfoIdTag } from "@/features/jobInfos/dbCache";
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser";
@@ -11,7 +11,7 @@ import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-export default async function JobInfoEditPage({
+export default async function JobInfoNewPage({
   params,
 }: {
   params: Promise<{ jobInfoId: string }>;
@@ -21,7 +21,9 @@ export default async function JobInfoEditPage({
   return (
     <div className="container my-4 max-w-5xl space-y-4">
       <JobInfoBackLink jobInfoId={jobInfoId} />
-      <h1 className="text-center text-3xl md:text-4xl">Edit Job Description</h1>
+
+      <h1 className="text-3xl md:text-4xl">Edit Job Description</h1>
+
       <Card>
         <CardContent>
           <Suspense
@@ -36,11 +38,10 @@ export default async function JobInfoEditPage({
 }
 
 async function SuspendedForm({ jobInfoId }: { jobInfoId: string }) {
-  const { userId, redirectToSignIn } = await getCurrentUser({});
+  const { userId, redirectToSignIn } = await getCurrentUser();
   if (userId == null) return redirectToSignIn();
 
   const jobInfo = await getJobInfo(jobInfoId, userId);
-
   if (jobInfo == null) return notFound();
 
   return <JobInfoForm jobInfo={jobInfo} />;
@@ -48,10 +49,9 @@ async function SuspendedForm({ jobInfoId }: { jobInfoId: string }) {
 
 async function getJobInfo(id: string, userId: string) {
   "use cache";
-
   cacheTag(getJobInfoIdTag(id));
 
-  return await db.query.JobInfoTable.findFirst({
+  return db.query.JobInfoTable.findFirst({
     where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
   });
 }
