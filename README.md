@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI-Powered Job Prep
 
-## Getting Started
+AI-Powered Job Prep is a full-stack web application that helps job seekers prepare for interviews and improve their resumes using AI. It combines mock interviews, tailored resume suggestions, and programming/technical practice questions into a single platform designed to give candidates a competitive edge.
 
-First, run the development server:
+This project showcases end-to-end product development skills — from database design and authentication to AI integration, streaming APIs, and responsive front-end design.
+
+## Overview
+
+Interview prep is time-consuming and unstructured for many candidates. This project solves that problem by combining user-supplied job information with AI to produce targeted practice questions, then storing sessions and offering automated feedback so users can iterate and improve over time.
+
+This repo demonstrates full-stack skills: a production-ready Next.js app (App Router) with server and client components, a type-safe database layer with Drizzle ORM and Postgres, third-party auth with Clerk, and AI-streaming integrations for a responsive UX.
+
+## Key Features
+
+- Speak with an AI in a mock interview environment.
+- Receive real-time feedback on your answers.
+- Upload your resume directly into the app.
+- AI analyzes and suggests ATS-friendly improvements.
+- Get recruiter-approved changes to maximize your chances of landing interviews.
+- Upload a job posting or enter details manually.
+- AI generates programming and technical questions tailored to the role.
+- Questions come with hints and structured feedback for iterative practice.
+
+## Tech Stack
+
+- Frontend: Next.js (App Router), React 19, TypeScript, Tailwind CSS, Shadcn UI, Lucide Icons
+- Backend: Node.js APIs, AI SDK (Google/OpenAI) with streaming support
+- Database: PostgreSQL + Drizzle ORM (type-safe schema and migrations)
+- Authentication: Clerk (secure, production-ready auth)
+- Other: Markdown rendering, resizable panels, streaming UX
+
+## Why these technologies
+
+- Next.js offers hybrid server/client rendering for fast initial loads and secure server-side logic. I used server components for sensitive logic (DB, auth) and client components for interactive UI.
+- Drizzle ORM provides type-safe queries which improved developer confidence and reduced runtime errors.
+- Clerk simplified authentication, allowing quick, secure user flows without building auth from scratch.
+- The AI SDK's streaming capabilities enabled a responsive, real-time UI for content generation.
+
+## Installation (macOS / Linux)
+
+1. Clone the repo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/<your-username>/ai-powered-job-prep.git
+cd ai-powered-job-prep
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies (pnpm recommended)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Create a `.env` file in the project root with the required variables:
 
-## Learn More
+```env
+DATABASE_URL=postgres://user:password@localhost:5432/dbname
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_xxx
+CLERK_API_KEY=sk_xxx
+AI_API_KEY=xxx
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Set up the database (use Docker or local Postgres). Then run Drizzle migrations or push the schema:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm db:push
+# or
+pnpm db:migrate
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Start the dev server
 
-## Deploy on Vercel
+```bash
+pnpm dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6. Open `http://localhost:3000` (or the port Next reports) in your browser.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Usage
+
+- Add a "Job Info" entry with role, company, and description.
+- Open the Job's Questions page and select a difficulty to generate a tailored question.
+- Type your answer in the right panel and request AI feedback.
+- Revisit previous questions from the DB for repeated practice.
+
+## API highlights
+
+- `POST /api/ai/questions/generate-question` — streams a generated question and persists it.
+- `POST /api/ai/questions/generate-feedback` — streams feedback for a provided question and answer.
+- `POST /api/ai/questions/latest` — returns the latest saved question for a job (id and text).
+
+## Example: Local workflow
+
+1. Create job info: `/app/job-infos/new`
+2. Navigate to `/app/job-infos/[jobId]/questions`
+3. Click a difficulty to generate. The question streams in, is saved, and appears in the left panel.
+4. Add an answer and request feedback.
+
+## Challenges & Solutions
+
+- Problem: Generated text was persisted but not visible in the UI. I traced the issue to the `latest` API that only returned an ID. I updated the query to include the `text` column and adjusted the client to use streamed completions while falling back to persisted data.
+
+## Future Improvements
+
+- Session history and answer replay with timestamps.
+- Analytics dashboard to surface common weaknesses and targeted study plans.
+- Model selection and prompt customization per user.
+- Add end-to-end tests and CI/CD for deployments.
+
+## Live Demo
+
+Add your deployed URL here (e.g. `https://your-app.example.com`) to make it easy for employers to try.
+
+## Contact
+
+- LinkedIn: https://www.linkedin.com/in/karim-youssef-1347b324a/
+- Portfolio: https://your-portfolio.example.com
+- Email: Karimm.youssef05@gmail.com
+
+---
