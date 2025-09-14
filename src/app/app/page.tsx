@@ -34,8 +34,7 @@ export default function AppPage() {
 }
 
 async function JobInfos() {
-  const { userId, redirectToSignIn } = await getCurrentUser({});
-
+  const { userId, redirectToSignIn } = await getCurrentUser();
   if (userId == null) return redirectToSignIn();
 
   const jobInfos = await getJobInfos(userId);
@@ -46,7 +45,7 @@ async function JobInfos() {
 
   return (
     <div className="container my-4">
-      <div className="mb-6 flex justify-between">
+      <div className="mb-6 flex justify-between gap-2">
         <h1 className="text-3xl md:text-4xl lg:text-5xl">
           Select a job description
         </h1>
@@ -61,8 +60,8 @@ async function JobInfos() {
         {jobInfos.map((jobInfo) => (
           <Link
             className="transition-[transform_opacity] hover:scale-[1.02]"
-            key={jobInfo.id}
             href={`/app/job-infos/${jobInfo.id}`}
+            key={jobInfo.id}
           >
             <Card className="h-full">
               <div className="flex h-full items-center justify-between">
@@ -82,7 +81,6 @@ async function JobInfos() {
                     )}
                   </CardFooter>
                 </div>
-
                 <CardContent>
                   <ArrowRightIcon className="size-6" />
                 </CardContent>
@@ -92,7 +90,7 @@ async function JobInfos() {
         ))}
         <Link className="transition-opacity" href="/app/job-infos/new">
           <Card className="hover:border-primary/50 flex h-full items-center justify-center border-3 border-dashed bg-transparent shadow-none transition-colors">
-            <div className="flex items-center justify-center gap-2 text-lg">
+            <div className="flex items-center gap-2 text-lg">
               <PlusIcon className="size-6" />
               New Job Description
             </div>
@@ -107,7 +105,7 @@ function NoJobInfos() {
   return (
     <div className="container my-4 max-w-5xl">
       <h1 className="mb-4 text-3xl md:text-4xl lg:text-5xl">
-        Welcome to Resumate AI
+        Welcome to Landr
       </h1>
       <p className="text-muted-foreground mb-8">
         To get started, enter information about the type of job you are wanting
@@ -127,10 +125,9 @@ function NoJobInfos() {
 
 async function getJobInfos(userId: string) {
   "use cache";
-
   cacheTag(getJobInfoUserTag(userId));
 
-  return await db.query.JobInfoTable.findMany({
+  return db.query.JobInfoTable.findMany({
     where: eq(JobInfoTable.userId, userId),
     orderBy: desc(JobInfoTable.updatedAt),
   });

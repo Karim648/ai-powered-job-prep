@@ -1,15 +1,5 @@
 "use client";
 
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { UserAvatar } from "@/features/users/components/UserAvatar";
-import { SignOutButton, useClerk } from "@clerk/nextjs";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import {
   BookOpenIcon,
   BrainCircuitIcon,
@@ -18,8 +8,18 @@ import {
   SpeechIcon,
   User,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { SignOutButton, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
+import { UserAvatar } from "@/features/users/components/UserAvatar";
 import { useParams, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 const navLinks = [
   { name: "Interviews", href: "interviews", Icon: SpeechIcon },
@@ -37,7 +37,7 @@ export function Navbar({ user }: { user: { name: string; imageUrl: string } }) {
       <div className="container flex h-full items-center justify-between">
         <Link href="/app" className="flex items-center gap-2">
           <BrainCircuitIcon className="text-primary size-8" />
-          <span className="text-xl font-bold">Resumate AI</span>
+          <span className="text-xl font-bold">Landr</span>
         </Link>
 
         <div className="flex items-center gap-4">
@@ -59,13 +59,14 @@ export function Navbar({ user }: { user: { name: string; imageUrl: string } }) {
                 </Button>
               );
             })}
+
           <ThemeToggle />
 
           <DropdownMenu>
             <DropdownMenuTrigger>
               <UserAvatar user={user} />
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem onClick={() => openUserProfile()}>
                 <User className="mr-2" />
                 Profile
